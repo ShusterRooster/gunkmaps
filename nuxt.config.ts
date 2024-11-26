@@ -2,7 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2024-04-03',
   devtools: { enabled: true },
-  modules: ['@nuxtjs/tailwindcss', '@nuxtjs/seo', '@nuxt/content', '@nuxt/ui'],
+  modules: ['@nuxtjs/seo', '@nuxt/content', '@nuxtjs/leaflet', '@nuxt/ui'],
 
   site: {
     name: 'gunkmaps :)',

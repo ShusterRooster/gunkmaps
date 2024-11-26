@@ -1,7 +1,7 @@
-import type { Config } from 'tailwindcss'
+
 
 export default {
-    content: [],
+    content: ['./pages/**/*.{html,js}', './components/**/*.{html,js}'],
     theme: {
         screens: {
             sm: '480px',
@@ -11,11 +11,11 @@ export default {
         }, //optional?
 
 
-        colors: {
-            'background': '#1e293b',
-            'text' : '#FFFFFF',
-            'fugly': '#bf6ed7'
-        },
+        // colors: {
+        //     // 'background': '#1e293b',
+        //     // 'text': '#FFFFFF',
+        //     'fugly': '#bf6ed7'
+        // },
 
         fontFamily: {
             sans: ['Graphik', 'sans-serif'],
@@ -25,4 +25,4 @@ export default {
         extend: {},
     },
     plugins: [],
-} satisfies Config
+}
