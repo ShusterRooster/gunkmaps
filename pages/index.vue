@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import balls from '~/components/getPreview'
+import type {ParsedContent} from "@nuxt/content";
+import type {PinData} from "~/components/PinData";
 
 useSeoMeta({
   // title: 'gunkmaps !',
-  description: 'fart balls',
-  ogTitle: 'GunkMaps - hawk tuah',
-  ogDescription: 'fart balls',
+  description: 'Welcome to GunkMaps',
+  ogTitle: 'GunkMaps',
+  ogDescription: 'Welcome to GunkMaps',
   ogImage: '[og:image]',
   ogUrl: 'gunkmaps.com',
   twitterTitle: '[twitter:title]',
@@ -26,30 +27,52 @@ useHead({
   ]
 })
 
-let show = ref(true);
-
-function test() {
-  show.value = !show.value
-  console.log(show.value)
-}
-
-const contentQuery = queryContent('testing')
-
-console.log(contentQuery.find())
-
-// balls(new File("./content/testing/hello.md"))
-
+const show = ref(false);
+const divCard = ref();
 
 const title = ref<HTMLParagraphElement>()
-const recent = ref<HTMLParagraphElement>()
+const description = ref<HTMLParagraphElement>()
 const historic = ref<HTMLParagraphElement>()
 
-function update(t: string, desc: string) {
-  title.value!.textContent = t
-  recent.value!.textContent = desc
+let posts = ref<ParsedContent[]>()
 
-  console.log(t)
+onMounted(async () => {
+  // Wait for the next DOM update cycle
+  await nextTick()
+  hideCard()
+})
+
+function hideCard() {
+  show.value = false
+  divCard.value.style.transform = `translate(${divCard.value.clientWidth}px, -50%)`
+  console.log(divCard.value.style.right)
 }
+
+function showCard() {
+  show.value = true
+  divCard.value.style.transform = `translate(0px, -50%)`
+}
+
+async function update(pin: PinData) {
+  showCard()
+  divCard.value.style.filter = 'blur(30px)'
+
+  setTimeout(async () => {
+    const content = queryContent(pin.nav)
+    const info = await content.find()
+
+    title.value!.textContent = info[0].title!
+    description.value!.textContent = info[0].description!
+
+    posts.value = await content.find()
+    divCard.value.style.filter = 'blur(0px)'
+  }, 500)
+}
+
+//create a new pin? Follow below structure.
+const testingPin: PinData = {coords: [41.739955, -74.083383], nav: "testing"}
+const csb: PinData = {coords: [41.742363, -74.083466], nav: "csb"}
+const lectureCenter: PinData = {coords: [41.742673, -74.084128], nav: "lc"}
 
 </script>
 
@@ -57,35 +80,48 @@ function update(t: string, desc: string) {
   <title>testing</title>
   <div id="container" class="bg-background">
 
-    <UCard id="card" v-if="show">
-      <template #header class="text-xl">
-        <p ref="title" class="text-5xl font-extrabold">title</p>
-      </template>
+    <div id="divCard" ref="divCard">
+      <UCard id="card" class="rounded-s-3xl">
 
-      <h3 ref="recent">recent</h3>
+        <!--      Title and description-->
+        <template #header>
+          <div class="text-xl p-4 space-y-4">
+            <p ref="title" class="text-5xl font-extrabold">title</p>
+            <h3 ref="description">description</h3>
+          </div>
+        </template>
 
-      <template #footer>
-        <p ref="historic">historic</p>
-      </template>
-    </UCard>
+        <!--      Will appear if there are no posts in that pin-->
+        <p v-if="posts?.length == 0" class="text-3xl text-extrabold">No posts yet! Be the first to submit one!</p>
+
+        <div v-for="post in posts">
+          <Entry :title="post.title!" :desc="post.description!" :link="post._path!"></Entry>
+        </div>
+
+        <template #footer>
+          <p ref="historic">historic</p>
+        </template>
+      </UCard>
+    </div>
 
     <div style="margin-bottom: 3em">
       <h1 class="text-5xl font-extrabold my-5 ">
         Welcome to GunkMaps!
       </h1>
 
-      <!--      https://www.openstreetmap.org/#map=16/41.73854/-74.08594-->
-
-      <div id="map" ref="poop" class="rounded-3xl">
+      <!--      leaflet map implementation-->
+      <div id="map" class="rounded-3xl">
         <LMap style="z-index: 1"
-            :zoom="16"
-            :minZoom="15"
-            :center="[41.73854, -74.08594]"
-            :use-global-leaflet="false"
-            ref="map">
+              :zoom="16"
+              :minZoom="15"
+              :center="[41.73854, -74.08594]"
+              :use-global-leaflet="false"
+              ref="map">
 
-
-          <Pin :coords="[41.739955, -74.083383]" title="testing" @pinClick="update"></Pin>
+          <!-- creating a new pin? Don't forget to do this!!!!!!!!!!!!!         -->
+          <Pin :data="testingPin" @click="update"></Pin>
+          <Pin :data="csb" @click="update"></Pin>
+          <Pin :data="lectureCenter" @click="update"></Pin>
 
 
           <LTileLayer
@@ -124,17 +160,27 @@ function update(t: string, desc: string) {
 }
 
 #card {
+  width: 100%;
+  height: 100%;
+}
+
+#divCard {
   position: absolute;
   top: 50%;
+
   right: 0;
   margin: auto;
   z-index: 99;
-
-  width: 30vw;
   height: 100%;
-  text-align: center;
+  width: 30vw;
 
-  transform: translateY(-50%);
+  display: flex;
+  text-align: center;
+  flex-direction: column;
+  align-items: center;
+
+  transition: all 0.5s ease-in-out;
+  transform: translate(100%, -50%);
 }
 
 #map {

@@ -3,14 +3,9 @@
 ### this is an awesome WIP project by Ben Fisher and Julian Shuster
 
 ### To-Dos:
-* Get posts components up
-* pull hyphenated data (title and descriptor) display on text pop up
-* figure out content management (Nuxt Content)
 * make a View All posts thingy
+  * Search bar
 * light and dark mode (optional)
 * FUTURE: text editor thing
-
-
-
 
 #awesomesauce

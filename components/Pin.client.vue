@@ -1,22 +1,28 @@
 <script setup lang="ts">
+import type {PinData} from "~/components/PinData";
+
 const props = defineProps<{
-  coords: [number, number],
-  title: string,
+  data: PinData
 }>()
 
+// const emit = defineEmits<{
+//   (e: 'click', title: string, desc: string): void
+// }>()
+
 const emit = defineEmits<{
-  (e: 'pinClick', title: string, desc: string): void
+  (e: 'click', data: PinData): void
 }>()
 
 </script>
 
 
 <template>
-  <LMarker :lat-lng="props.coords" @click="$emit('pinClick', props.title, 'test desc')">
+  <LMarker :lat-lng="props.data.coords" @click="$emit('click', props.data)">
     <LIcon icon-url="https://api.iconify.design/material-symbols:location-on.svg" :icon-size="[32, 42]">
     </LIcon>
 
-    <LTooltip>burger cart</LTooltip>
+<!--    //props.data.title-->
+    <LTooltip>title</LTooltip>
   </LMarker>
 </template>
 
