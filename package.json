@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@nuxtjs/leaflet": "^1.2.4",
+    "@vercel/blob": "^0.27.1",
     "leaflet": "^1.9.4",
     "nuxt": "^3.14.159",
     "vue": "latest",
