@@ -5,7 +5,7 @@
 <template>
   <div id="container">
     <main>
-      <ContentDoc/>
+<!--      <ContentDoc/>-->
     </main>
   </div>
 </template>

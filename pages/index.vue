@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type {ParsedContent} from "@nuxt/content";
 import type {PinData} from "~/components/PinData";
 
 useSeoMeta({
@@ -27,14 +26,19 @@ useHead({
   ]
 })
 
+const route = useRoute()
+const { data } = await useAsyncData("pins", () => {
+  return queryCollection('pins').all()
+})
+
+console.log(data)
+
 const show = ref(false);
 const divCard = ref();
 
 const title = ref<HTMLParagraphElement>()
 const description = ref<HTMLParagraphElement>()
 const historic = ref<HTMLParagraphElement>()
-
-let posts = ref<ParsedContent[]>()
 
 onMounted(async () => {
   // Wait for the next DOM update cycle
@@ -53,27 +57,30 @@ function showCard() {
   divCard.value.style.transform = `translate(0px, -50%)`
 }
 
-async function update(pin: PinData) {
+async function update(nav: string) {
+  const { data: page } = await useAsyncData(nav, () => {
+    return queryCollection('all').path(`${nav}/`).all()
+  })
+
+  console.log(page)
+  console.log(nav)
+
+
   showCard()
   divCard.value.style.filter = 'blur(30px)'
 
-  setTimeout(async () => {
-    const content = queryContent(pin.nav)
-    const info = await content.find()
 
-    title.value!.textContent = info[0].title!
-    description.value!.textContent = info[0].description!
-
-    posts.value = await content.find()
-    divCard.value.style.filter = 'blur(0px)'
-  }, 500)
+  // setTimeout(async () => {
+  //   const content = queryContent(pin.nav)
+  //   const info = await content.find()
+  //
+  //   title.value!.textContent = info[0].title!
+  //   description.value!.textContent = info[0].description!
+  //
+  //   posts.value = await content.find()
+  //   divCard.value.style.filter = 'blur(0px)'
+  // }, 500)
 }
-
-//create a new pin? Follow below structure.
-const testingPin: PinData = {coords: [41.739955, -74.083383], nav: "testing"}
-const csb: PinData = {coords: [41.742363, -74.083466], nav: "csb"}
-const lectureCenter: PinData = {coords: [41.742673, -74.084128], nav: "lc"}
-
 </script>
 
 <template>
@@ -92,11 +99,11 @@ const lectureCenter: PinData = {coords: [41.742673, -74.084128], nav: "lc"}
         </template>
 
         <!--      Will appear if there are no posts in that pin-->
-        <p v-if="posts?.length == 0" class="text-3xl text-extrabold">No posts yet! Be the first to submit one!</p>
+        <p v-if="data?.length == 0" class="text-3xl text-extrabold">No posts yet! Be the first to submit one!</p>
 
-        <div v-for="post in posts">
-          <Entry :title="post.title!" :desc="post.description!" :link="post._path!"></Entry>
-        </div>
+<!--        <div v-for="post in data">-->
+<!--          <Entry :title="post.title" :desc="post.description" :link="post.path"></Entry>-->
+<!--        </div>-->
 
         <template #footer>
           <p ref="historic">historic</p>
@@ -118,11 +125,7 @@ const lectureCenter: PinData = {coords: [41.742673, -74.084128], nav: "lc"}
               :use-global-leaflet="false"
               ref="map">
 
-          <!-- creating a new pin? Don't forget to do this!!!!!!!!!!!!!         -->
-          <Pin :data="testingPin" @click="update"></Pin>
-          <Pin :data="csb" @click="update"></Pin>
-          <Pin :data="lectureCenter" @click="update"></Pin>
-
+          <Pin v-for="pin in data" :data="pin" @click="update"></Pin>
 
           <LTileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
