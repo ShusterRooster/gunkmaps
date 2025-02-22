@@ -7,5 +7,7 @@
   * Search bar
 * light and dark mode (optional)
 * FUTURE: text editor thing
+* Integrate vercel for database
+* Create Api for location
 
 #awesomesauce
